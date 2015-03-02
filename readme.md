@@ -1,25 +1,46 @@
-## Laravel PHP Framework
+## Laravel 4.2 PHP Framework Proof of Concept (PoC)
 
-[![Build Status](https://travis-ci.org/laravel/framework.svg)](https://travis-ci.org/laravel/framework)
-[![Total Downloads](https://poser.pugx.org/laravel/framework/downloads.svg)](https://packagist.org/packages/laravel/framework)
-[![Latest Stable Version](https://poser.pugx.org/laravel/framework/v/stable.svg)](https://packagist.org/packages/laravel/framework)
-[![Latest Unstable Version](https://poser.pugx.org/laravel/framework/v/unstable.svg)](https://packagist.org/packages/laravel/framework)
-[![License](https://poser.pugx.org/laravel/framework/license.svg)](https://packagist.org/packages/laravel/framework)
+Detailed layout of src files used:
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable, creative experience to be truly fulfilling. Laravel attempts to take the pain out of development by easing common tasks used in the majority of web projects, such as authentication, routing, sessions, and caching.
+* ss-uploader/app/database/migrations/
+0. 2015_03_02_161412_CreateUsersTable.php 
+   Defines 'ssup_users' table.
+1. 2015_03_02_161504_CreateContactsAndPhonenumbersAndEmailsAndLogsTables.php
+   Defines ssup_contacts, ssup_phone_numbers, ssup_emails and ssup_user_logs tables.
+   
+* ss-uploader/app/database/seeds/
+0. SeedUsersTableTableSeeder.php
+   Populates 'ssup_users' table with some users.
 
-Laravel aims to make the development process a pleasing one for the developer without sacrificing application functionality. Happy developers make the best code. To this end, we've attempted to combine the very best of what we have seen in other web frameworks, including frameworks implemented in other languages, such as Ruby on Rails, ASP.NET MVC, and Sinatra.
+* ss-uploader/app/models/
+0. Contact.php, Email.php, PhoneNumber.php, User.php, UserLog.php
+   Eloquent ORM mappings for DB tables.
+   
+* ss-uploader/app/
+0. routes.php
+   Routes for the PoC: login, upload, profile, logout.
 
-Laravel is accessible, yet powerful, providing powerful tools needed for large, robust applications. A superb inversion of control container, expressive migration system, and tightly integrated unit testing support give you the tools you need to build any application with which you are tasked.
+* ss-uploader/app/views/users/
+0. login.blade.php
+   Page for log users in.
+1. create.blade.php
+   Page for registering new users.
+2. profile.blade.php
+   Users update page (unfinished).
 
-## Official Documentation
+* ss-uploader/app/views/files/
+0. upload.blade.php
+   Page for uploading files (CSV format only).
+1. log.blade.php
+   Page showing statistics about last file upload.
 
-Documentation for the entire framework can be found on the [Laravel website](http://laravel.com/docs).
+* ss-uploader/app/controllers/
+0. UsersController.php
+   Handles User business entity related use cases (login, logout, registration, profile).
+1. FilesController.php
+   Handles Contact business entity related use cases (upload file, log report).
 
-### Contributing To Laravel
+Detailed of libraries used:
 
-**All issues and pull requests should be filed on the [laravel/framework](http://github.com/laravel/framework) repository.**
-
-### License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](http://opensource.org/licenses/MIT)
+* Laravel Excel v2.0.0
+Create and import Excel and CSV files in Laravel.
