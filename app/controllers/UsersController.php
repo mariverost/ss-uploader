@@ -97,8 +97,8 @@ class UsersController extends \BaseController {
 
 		$validator = Validator::make($data, 
 			[
-                'first_name' => 'required|min:5',
-                'last_name' => 'required|min:5',
+                'first_name' => 'required|min:5|max:32',
+                'last_name' => 'required|min:5|max:32',
                 'email' => 'required|email|min:5',
                 'password' => 'required|min:5|confirmed',
                 'password_confirmation'=> 'required|min:5'

@@ -124,7 +124,9 @@ return array(
 		
 		'Way\Generators\GeneratorsServiceProvider',
 		
-		'Maatwebsite\Excel\ExcelServiceProvider'
+		'Maatwebsite\Excel\ExcelServiceProvider',
+		
+		'Cartalyst\Sentry\SentryServiceProvider'
 	),
 
 	/*
@@ -193,7 +195,8 @@ return array(
 		'View'            => 'Illuminate\Support\Facades\View',
 		
 		'Excel' => 'Maatwebsite\Excel\Facades\Excel',
-
+		
+		'Sentry' => 'Cartalyst\Sentry\Facades\Laravel\Sentry',
 	),
 
 );

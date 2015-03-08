@@ -19,50 +19,50 @@ class FilesController extends \BaseController {
 	 * @return View log
 	 */
 	public function handleUpload()
-	{
+	{		
 		if (Input::hasFile('fileToProcess')) {
 			//Start time of the upload process
 			$startTime = microtime(true);
 			
             $fileToProcess = Input::file('fileToProcess');
             
-			//Excel and CSV files management PHPExcel library for Laravel  
-			Excel::load($fileToProcess, function($reader) {
-				$reader->setDateFormat('Y-m-d H:i:s');
-                $results = $reader->get();
+			//Excel and CSV files management PHPExcel library for Laravel 
+			$results = Excel::load($fileToProcess)->get();
+			
+			$rules = [
+						'last_name' => 'required|string|min:5|max:33',
+						'first_name' => 'required|string|min:5|max:33',
+						'gender' => 'required|string|max:2',
+						'birthdate' =>'required|date',
+						'phone_number' => 'required|string|regex:/[0-9]{10,11}/',
+						'email' => 'required|email|min:5',
+			];
+					
+			//To keep row index in case of validation failure
+			$rowIndex = 0;
+			
+			foreach ($results as $result) {
 				
-				$rules = [
-						'last_name' => 'string|required|max:32',
-						'first_name' => 'string|required|max:32',
-						'gender' => 'string|required',
-						'birthdate' =>'date|required',
-						'phone_number' => 'string|required|regex:/[0-9]{10,11}/',
-						'email' => 'string|required',		
-					];
+				$rowIndex = $rowIndex + 1;
 				
-				//To keep row index in case of validation failure
-				$rowIndex = 0;
-                
-				foreach ($results as $result) {
-					$rowIndex = $rowIndex + 1;
-					//Loads row data
-					$row = [
-						'last_name' => $result->last_name,
-						'first_name' => $result->first_name,
-						'gender' => $result->gender,
-						'birthdate' => $result->birthdate,
-						'phone_number' => $result->phone_number,
-						'email' => $result->email,
-					];	
+				//Loads row data
+				$row = [
+					'last_name' => $result->last_name,
+					'first_name' => $result->first_name,
+					'gender' => $result->gender,
+					'birthdate' => $result->birthdate,
+					'phone_number' => $result->phone_number,
+					'email' => $result->email,
+				];	
 					
-					$validator = Validator::make($row, $rules);
+				$validator = Validator::make($row, $rules);
 					
-					if($validator->fails()){
-						// Adds row index to better inform the user
-						$validator->getMessageBag()->add('rowIndex', 'Row Number: ' .$rowIndex. '.');						
-						return Redirect::route('upload')->withErrors($validator)->withInput();
-					}
-					
+				if($validator->fails()){
+					// Adds row index to better inform the user
+					$validator->getMessageBag()->add('rowIndex', 'Row Number: ' .$rowIndex. '.');						
+					return Redirect::route('upload')->withErrors($validator)->withInput();
+					break;						
+				} else {
 					// Creates ORM objects from row data
 					$contact = new Contact;
 					
@@ -70,22 +70,23 @@ class FilesController extends \BaseController {
 					$contact->last_name = $result->last_name;
 					$contact->first_name = $result->first_name;
 					$contact->gender = $result->gender;
-					$contact->birthdate = $result->birthdate;
-					
+					$contact->birthdate = date('Y-m-d H:i:s', strtotime($result->birthdate));
+						
 					// Persist the object to the DB
 					$contact->save();
-					
+						
 					// Creates ORM objects from row data
 					$phoneNumber = new PhoneNumber;
 					$phoneNumber->phone_number = $result->phone_number;
 					$contact->phoneNumbers()->save($phoneNumber);
-					
+						
 					// Creates ORM objects from row data
 					$email = new Email;
 					$email->email = $result->email;					
 					$contact->emails()->save($email);
-                }
-            });
+				}					
+            }
+			
 			// Calculates time spent uploading data
 			$endTime = microtime(true);
 			$timeDiff = $endTime - $startTime;
@@ -106,9 +107,11 @@ class FilesController extends \BaseController {
 			Session::flash('upload_time', 'Upload Time (in seconds): ' .$userLog->upload_time. '.'); 			
 			Session::flash('error_count', 'Error Count: ' .$userLog->error_count. '.');
 			Session::flash('upload_date', 'Upload Date: ' . $userLog->upload_date. '.');
+			
+			return Redirect::route('log');			
         }
-		
-		return Redirect::route('log')->withInput();
+		// Uploading unsuccessful, returns login view.
+        return Redirect::route('upload');
 	}
 	
 	/**
