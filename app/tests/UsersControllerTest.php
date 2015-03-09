@@ -2,19 +2,29 @@
 
 class UsersControllerTest extends TestCase {
  
+     /**
+	 * Set up testing env.
+	 *
+	 * @return 
+	 */
     public function setUp()
     {
         parent::setUp();
-        $this->mock = Mockery::mock('Eloquent', 'User');
- 
-        $_ENV['DB_HOST'] = 'localhost';
-        $_ENV['DB_NAME'] = 'ss_uploader';
-        $_ENV['DB_USERNAME'] = 'root';
-        $_ENV['DB_PASSWORD'] = ''; 
+		// Enables filters (as they are turned off when environment set to testing)
+		Route::enableFilters();
+		
+		$this->mock = Mockery::mock('Eloquent', 'User');
     }
  
+	/**
+	 * Tears down testing env.
+	 *
+	 * @return 
+	 */
     public function tearDown()
     {
+		//Workaround for:
+		//ErrorException: Notice: ob_end_clean(): failed to delete buffer
 		if (ob_get_length() == 0 ) {
 			ob_start();
 		}
@@ -22,30 +32,33 @@ class UsersControllerTest extends TestCase {
 		Mockery::close();
     }
  
+	/**
+	 * Tests user creation.
+	 *
+	 * @return 
+	 */
     public function testStoreSuccess()
     {
-        // Establish us as Admin (user_id == 1)
-        //$user = Sentry::findUserByID(1);
-        //Sentry::setUser($user);
- 
-        Input::replace($input = ['first_name' => 'Nohora',
+		// Mock input data
+		Input::replace($input = ['first_name' => 'Nohora',
 								'last_name' => 'Trujillo', 
 								'email' => 'nonitrujillo@gmail.com',
 								'password' => 'nonitrujillo',
 								'password_confirmation' => 'nonitrujillo',
 		]);
  
+		
         $this->mock
             ->shouldReceive('store')
             ->once()
             ->with($input);
- 
-        $this->app->instance('User', $this->mock);
- 
-        $this->call('GET', '/user/create', $input);
- 
-        $this->assertRedirectedTo('upload');
 		
+		$this->app->instance('User', $this->mock);
+ 
+		//Invoke route
+        $this->call('GET', '/user/create', $input);
+         
+		$this->assertRedirectedTo('upload');		
     }
  
 }

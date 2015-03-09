@@ -7,7 +7,7 @@ class SeedUsersTableTableSeeder extends Seeder {
 
 	public function run()
 	{
-		DB::table('ssup_users')->truncate();
+		//DB::table('ssup_users')->truncate();
 
 		$users = [
             [

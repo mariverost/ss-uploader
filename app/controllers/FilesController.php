@@ -35,7 +35,7 @@ class FilesController extends \BaseController {
 						'gender' => 'required|string|max:2',
 						'birthdate' =>'required|date',
 						'phone_number' => 'required|string|regex:/[0-9]{10,11}/',
-						'email' => 'required|email|min:5',
+						'email' => 'required|string|min:5',
 			];
 					
 			//To keep row index in case of validation failure
